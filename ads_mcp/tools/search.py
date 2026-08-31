@@ -43,7 +43,8 @@ def search(
 
     """
 
-    ga_service = utils.get_googleads_service("GoogleAdsService")
+    clean_customer_id = str(customer_id).replace("-", "").strip()
+    ga_service = utils.get_googleads_service("GoogleAdsService", customer_id=clean_customer_id)
 
     query_parts = [f"SELECT {','.join(fields)} FROM {resource}"]
 
@@ -59,11 +60,11 @@ def search(
     query_parts.append(" PARAMETERS omit_unselected_resource_names=true")
 
     query = "".join(query_parts)
-    utils.logger.info(f"ads_mcp.search query {query}")
+    utils.logger.info(f"ads_mcp.search query {query} for customer {clean_customer_id}")
 
     try:
         query_result = ga_service.search_stream(
-            customer_id=customer_id, query=query
+            customer_id=clean_customer_id, query=query
         )
 
         final_output: List = []
